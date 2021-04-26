@@ -6,12 +6,10 @@ import time
 circle_buff = Queue(maxsize=0)
 
 class spirit(object):
-    def __init__(self,x=280,y=480,r=30,dir_x=1,dir_y=1,speed_x=2,speed_y=2):
+    def __init__(self,x=280,y=480,r=30,speed_x=2,speed_y=2):
         self.x=x
         self.y=y
         self.r=r
-        self.dir_x=dir_x
-        self.dir_y=dir_y
         self.speed_x=speed_x
         self.speed_y=speed_y
 
@@ -34,47 +32,42 @@ def draw_clear():
     PlayArea.grid()
 
 def hit_wall_detect(instance):
-    instance.x+=(instance.dir_x*instance.speed_x)
+    instance.x+=instance.speed_x
     if (instance.x+instance.r)>=720 or (instance.x-instance.r)<=0:
         if (instance.x+instance.r)>=720:
             instance.x=720-instance.r
         else:
             instance.x=instance.r
-        instance.dir_x=-instance.dir_x
+        instance.speed_x=-instance.speed_x
 
-    instance.y+=(instance.dir_y*instance.speed_y)
+    instance.y+=instance.speed_y
     if (instance.y+instance.r)>=720 or (instance.y-instance.r)<=0:
 
         if (instance.y+instance.r)>=720:
             instance.y=720-instance.r
         else:
             instance.y=instance.r
-        instance.dir_y=-instance.dir_y
+        instance.speed_y=-instance.speed_y
 def coll_speed(body1,body2):
-    body1.speed_x = ((body1.r-body2.r)*body1.speed_x*body1.dir_x + 2*body2.r*body2.speed_x*body2.dir_x)//(body1.r+body2.r)
-    if body1.speed_x<0:
-        body1.dir_x = -body1.dir_x
-        body1.speed_x = -body1.speed_x
-    body1.speed_y = ((body1.r-body2.r)*body1.speed_y*body1.dir_y + 2*body2.r*body2.speed_y*body2.dir_y)//(body1.r+body2.r)
-    if body1.speed_y<0:
-        body1.dir_y = -body1.dir_y
-        body1.speed_y = -body1.speed_y
-    body2.speed_x = ((body2.r-body1.r)*body2.speed_x*body2.dir_x + 2*body1.r*body1.speed_x*body1.dir_x)//(body1.r+body2.r)
-    if body2.speed_x<0:
-        body2.dir_x = -body2.dir_x
-        body2.speed_x = -body2.speed_x
-    body2.speed_y = ((body2.r-body1.r)*body2.speed_y*body2.dir_y + 2*body1.r*body1.speed_y*body1.dir_y)//(body1.r+body2.r)
-    if body2.speed_y<0:
-        body2.dir_y = -body2.dir_y
-        body2.speed_y = -body2.speed_y
+    print("before<%d,%d>,m1:%d,<%d,%d>,m2:%d"%(body1.speed_x,body1.speed_y,body1.r,body2.speed_x,body2.speed_y,body2.r))
+    temp_value1 = ((body1.r-body2.r)*body1.speed_x + 2*body2.r*body2.speed_x)//(body1.r+body2.r)
+    temp_value2 = ((body1.r-body2.r)*body1.speed_y + 2*body2.r*body2.speed_y)//(body1.r+body2.r)
+    temp_value3 = ((body2.r-body1.r)*body2.speed_x + 2*body1.r*body1.speed_x)//(body1.r+body2.r)
+    temp_value4 = ((body2.r-body1.r)*body2.speed_y + 2*body1.r*body1.speed_y)//(body1.r+body2.r)
+    body1.speed_x = temp_value1
+    body1.speed_y = temp_value2
+    body2.speed_x = temp_value3
+    body2.speed_y = temp_value4
+    print("after:<%d,%d>,<%d,%d>"%(body1.speed_x,body1.speed_y,body2.speed_x,body2.speed_y))
 
 def hit_body_detect(body1,body2):
 
-    delta_x=abs((body1.x+(body1.dir_x*body1.speed_x))-(body2.x+(body2.dir_x*body2.speed_x)))
-    delta_y=abs((body1.y+(body1.dir_y*body1.speed_y))-(body2.y+(body2.dir_y*body2.speed_y)))
+    delta_x=abs((body1.x+body1.speed_x)-(body2.x+body2.speed_x))
+    delta_y=abs((body1.y+body1.speed_y)-(body2.y+body2.speed_y))
     if (delta_x**2+delta_y**2)<(body1.r+body2.r+80)**2:
         draw_line(body1.x,body1.y,body2.x,body2.y,"red")
     if (delta_x**2+delta_y**2)<=((body1.r+body2.r)**2):#碰撞了
+        print("coll!!")
         coll_speed(body1,body2)
         
         
@@ -82,9 +75,9 @@ def hit_body_detect(body1,body2):
         
 
 def rand_init_speed(ins_zero):
-    ins_zero.speed_x=random.randint(1,5)
-    ins_zero.speed_y=random.randint(1,5)
-    ins_zero.r=random.randint(10,20)
+    ins_zero.speed_x=5-random.randint(0,11)
+    ins_zero.speed_y=5-random.randint(0,11)
+    ins_zero.r=random.randint(10,50)
 
 if __name__=="__main__":
     win=tk.Tk()
@@ -118,7 +111,7 @@ if __name__=="__main__":
     rand_init_speed(ins_nine)
     rand_init_speed(ins_ten)
 
-    spirit_list=[ins_one,ins_two,ins_three,ins_four,ins_five,ins_six,ins_seven,ins_eight,ins_nine,ins_ten]#ins_three,ins_four,ins_five
+    spirit_list=[ins_one,ins_two,ins_three,ins_four,ins_five,ins_six,ins_seven,ins_eight,ins_nine,ins_ten]#ins_three,ins_four,ins_five,ins_six,ins_seven,ins_eight,ins_nine,ins_ten
     cnt=0
     while 1:
         for i in spirit_list:
